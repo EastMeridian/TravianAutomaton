@@ -9,8 +9,8 @@ import account from './account.json'
   // login
   await page.goto('https://ts1.travian.fr/login.php');
   await page.screenshot({path: 'view0.png'});
-  await page.type('[name=name]', 'EastMeridian');
-  await page.type('[name=password]', '1993');
+  await page.type('[name=name]', account.name);
+  await page.type('[name=password]', account.password);
   await Promise.all([
     page.waitForNavigation(),
     await page.click('[type=submit]'),
