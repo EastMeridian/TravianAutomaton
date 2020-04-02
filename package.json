@@ -1,0 +1,23 @@
+{
+  "name": "travian-automaton",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EastMeridian/TravianAutomaton.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EastMeridian/TravianAutomaton/issues"
+  },
+  "homepage": "https://github.com/EastMeridian/TravianAutomaton#readme",
+  "dependencies": {
+    "puppeteer": "^2.1.1"
+  }
+}
