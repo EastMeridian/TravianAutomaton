@@ -20,15 +20,24 @@ class Timer {
     result += `> Timer ${this.name} data\n`;
 
     Object.keys(this.times).forEach((key) => {
-      const delta = this.times[key].delta / 60000;
+      const { delta } = this.times[key];
       total += delta;
-      result += `- ${key}: ${delta.toFixed(5)} minutes\n`;
+      result += `- ${key}: ${delta} ms\n`;
     });
-    result += `total: ${total.toFixed(5)} minutes\n`;
+    result += `total: ${total} ms\n`;
     return result;
   }
 }
 
 const createTimer = ({ name }) => new Timer(name);
 
-export { createTimer };
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const randomSleep = (ms, variance) => {
+  const randomNumber = Math.random();
+  const randomVariance = variance * randomNumber;
+  const randomMs = randomNumber > 0.5 ? ms + randomVariance : ms - randomVariance;
+  return sleep(randomMs);
+};
+
+module.exports = { createTimer, sleep, randomSleep };

@@ -1,40 +1,59 @@
-import puppeteer from 'puppeteer';
-import account from './account.json'
-(async () => {
+const puppeteer = require('puppeteer');
+const account = require('./account.js');
+const { createTimer, randomSleep } = require('./src/utils/Time');
+const { createProvidersManager } = require('./src/factories/providers/index');
+const { makeProvidersAsync } = require('./src/providers.js');
+const createAutomate = require('./src/factories/createAutomate');
+const createPageManager = require('./src/factories/createPageManager');
 
+const timer = createTimer({ name: 'Main Loop' });
+
+const automate = createAutomate();
+
+
+console.log('createProviderManager', createProvidersManager);
+
+
+(async () => {
   // initialisation
   const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  const pageManager = createPageManager({ browser, account });
+  console.log('pageManager', pageManager);
 
-  // login
-  await page.goto('https://ts1.travian.fr/login.php');
-  await page.screenshot({ path: 'view0.png' });
-  await page.type('[name=name]', account.name);
-  await page.type('[name=password]', account.password);
-  await Promise.all([
-    page.waitForNavigation(),
-    await page.click('[type=submit]'),
-  ]);
+  await pageManager.loginAsync();
+  const providers = await makeProvidersAsync({ pageManager });
 
-  // navigate to dorf1
-  await page.goto('https://ts1.travian.fr/dorf1.php');
+  const providersManager = createProvidersManager({ providers });
 
-  await page.screenshot({ path: 'view1.png' });
+  const run = async () => {
+    // console.clear();
+    try {
+      timer.start('loop');
+      const {
+        ressources,
+        buildingList,
+        fields,
+      } = await providersManager.run();
 
-  const [wood, clay, iron, food, list] = await Promise.all([
-    await page.$eval('#l1', (element) => element.innerText),
-    await page.$eval('#l2', (element) => element.innerText),
-    await page.$eval('#l3', (element) => element.innerText),
-    await page.$eval('#l4', (element) => element.innerText),
-    await page.$$eval('.buildingList > .boxes-contents > ul]', (elements) => elements.map((element) => ({
-      building: element.children[1].innerText,
-      remainingTime: element.children[2].innerText,
-    }))),
-  ]);
+      automate.consume({
+        ressources,
+        buildingList,
+        fields,
+      });
+      automate.display();
+      timer.stop('loop');
 
-  console.log('wood: ', wood, ' | clay ', clay, ' | iron ', iron, ' | food ', food);
+      await randomSleep(1500, 500);
+      console.log('----------------------');
+      run();
+    } catch (e) {
+      console.error('catched', e);
+    }
+  };
+
+  run();
   // navigate to dorf2
-  await page.goto('https://ts1.travian.fr/dorf2.php');
-  await page.screenshot({ path: 'view2.png' });
-  await browser.close();
+  /*     await page.goto(`https://${account.server}.travian.fr/dorf2.php`);
+    await page.screenshot({ path: 'view2.png' });
+    await browser.close(); */
 })();
