@@ -19,7 +19,7 @@
   "homepage": "https://github.com/EastMeridian/TravianAutomaton#readme",
   "dependencies": {
     "jest": "^25.3.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "puppeteer": "^2.1.1"
   },
   "devDependencies": {
